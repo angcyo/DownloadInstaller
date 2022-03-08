@@ -373,25 +373,29 @@ public class DownloadInstaller {
                     downLoadStatusMap.put(downloadApkUrlMd5, UpdateStatus.UN_DOWNLOAD);
                 }
             } else {
-                Uri packageURI = Uri.parse("package:" + AppUtils.getPackageName(mContext));
-                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI);
+                if (startActivityLauncher == null) {
+                    installApk();
+                    downLoadStatusMap.put(downloadApkUrlMd5, UpdateStatus.UN_DOWNLOAD);
+                } else {
+                    Uri packageURI = Uri.parse("package:" + AppUtils.getPackageName(mContext));
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI);
 
-                //这里有些手机拿不到返回的值，每家厂商的策略不同....
-                startActivityLauncher.launch(intent, result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        if (downloadStatus == UpdateStatus.UNINSTALL) {
-                            installProcess();
-                        }
-                    } else {
-                        //如果是企业内部应用升级，肯定是要这个权限，其他情况不要太流氓，TOAST 提示
-                        if (isForceGrantUnKnowSource) {
-                            installProcess();
+                    //这里有些手机拿不到返回的值，每家厂商的策略不同....
+                    startActivityLauncher.launch(intent, result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            if (downloadStatus == UpdateStatus.UNINSTALL) {
+                                installProcess();
+                            }
                         } else {
-                            Toast.makeText(mContext, "你没有授权安装App", Toast.LENGTH_LONG).show();
+                            //如果是企业内部应用升级，肯定是要这个权限，其他情况不要太流氓，TOAST 提示
+                            if (isForceGrantUnKnowSource) {
+                                installProcess();
+                            } else {
+                                Toast.makeText(mContext, "你没有授权安装App", Toast.LENGTH_LONG).show();
+                            }
                         }
-                    }
-                });
-
+                    });
+                }
             }
         } else {
             installApk();
