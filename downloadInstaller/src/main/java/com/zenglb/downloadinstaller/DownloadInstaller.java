@@ -80,6 +80,7 @@ public class DownloadInstaller {
     private String storagePrefix;
 
     private boolean isDownloadOnly = false;
+    public boolean checkInstallPermission = false;
     private StartActivityLauncher startActivityLauncher;
 
 
@@ -363,7 +364,10 @@ public class DownloadInstaller {
             boolean canInstallPackage = mContext.getPackageManager().canRequestPackageInstalls();
             final Integer downloadStatus = downLoadStatusMap.get(downloadApkUrlMd5); //unboxing
 
-            if (canInstallPackage) {
+            if (!checkInstallPermission) {
+                installApk();
+                downLoadStatusMap.put(downloadApkUrlMd5, UpdateStatus.UN_DOWNLOAD);
+            } else if (canInstallPackage) {
                 if (downloadStatus == UpdateStatus.UNINSTALL) {
                     installApk();
                     downLoadStatusMap.put(downloadApkUrlMd5, UpdateStatus.UN_DOWNLOAD);
