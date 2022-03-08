@@ -15,15 +15,11 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.collection.ArrayMap;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
-
 
 import com.dylanc.activityresult.launcher.StartActivityLauncher;
 
@@ -83,7 +79,7 @@ public class DownloadInstaller {
 
     private String storagePrefix;
 
-    private boolean isDownloadOnly=false;
+    private boolean isDownloadOnly = false;
     private StartActivityLauncher startActivityLauncher;
 
 
@@ -93,8 +89,8 @@ public class DownloadInstaller {
      * @param context        上下文
      * @param downloadApkUrl apk 下载地址
      */
-    public DownloadInstaller(Context context, String downloadApkUrl,StartActivityLauncher startActivityLauncher) {
-        this(context, downloadApkUrl, startActivityLauncher,false, null);
+    public DownloadInstaller(Context context, String downloadApkUrl, StartActivityLauncher startActivityLauncher) {
+        this(context, downloadApkUrl, startActivityLauncher, false, null);
     }
 
 
@@ -105,8 +101,8 @@ public class DownloadInstaller {
      * @param downloadApkUrl apk下载地址
      * @param callBack       进度状态回调
      */
-    public DownloadInstaller(Context context, String downloadApkUrl,StartActivityLauncher startActivityLauncher, DownloadProgressCallBack callBack) {
-        this(context, downloadApkUrl, startActivityLauncher,false, callBack);
+    public DownloadInstaller(Context context, String downloadApkUrl, StartActivityLauncher startActivityLauncher, DownloadProgressCallBack callBack) {
+        this(context, downloadApkUrl, startActivityLauncher, false, callBack);
     }
 
 
@@ -122,13 +118,13 @@ public class DownloadInstaller {
                              boolean isForceGrantUnKnowSource, DownloadProgressCallBack callBack) {
         this.mContext = context;
         this.downloadApkUrl = downloadApkUrl;
-        this.startActivityLauncher=startActivityLauncher;
+        this.startActivityLauncher = startActivityLauncher;
         this.isForceGrantUnKnowSource = isForceGrantUnKnowSource;
         this.downloadProgressCallBack = callBack;
     }
 
-    private void setDownloadOnly(boolean isDownloadOnly){
-        this.isDownloadOnly=isDownloadOnly;
+    private void setDownloadOnly(boolean isDownloadOnly) {
+        this.isDownloadOnly = isDownloadOnly;
     }
 
 
@@ -192,11 +188,11 @@ public class DownloadInstaller {
             new Thread(mDownApkRunnable).start();
         } else if (downloadStatus == UpdateStatus.DOWNLOADING) {
             Toast.makeText(mContext, "正在下载App", Toast.LENGTH_SHORT).show();
-        }else if (downloadStatus==UpdateStatus.UNINSTALL){
-            if(null!=downloadProgressCallBack){
+        } else if (downloadStatus == UpdateStatus.UNINSTALL) {
+            if (null != downloadProgressCallBack) {
                 downloadProgressCallBack.downloadProgress(100);
             }
-            if(!isDownloadOnly){
+            if (!isDownloadOnly) {
                 ((Activity) mContext).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -243,7 +239,7 @@ public class DownloadInstaller {
                 File apkFile = new File(storageApkPath);
                 if (apkFile.exists() && apkFile.length() == length) {
                     //已经下载过了，直接的progress ==100,然后去安装
-                    progress=100;
+                    progress = 100;
                     updateNotify(progress);
                     if (downloadProgressCallBack != null) {
                         downloadProgressCallBack.downloadProgress(progress);
@@ -251,7 +247,7 @@ public class DownloadInstaller {
 
                     conn.disconnect();
 
-                    if(!isDownloadOnly){
+                    if (!isDownloadOnly) {
                         ((Activity) mContext).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -284,7 +280,7 @@ public class DownloadInstaller {
                     fos.write(buf, 0, byteCount);
                 }
 
-                if(!isDownloadOnly){
+                if (!isDownloadOnly) {
                     ((Activity) mContext).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -321,7 +317,7 @@ public class DownloadInstaller {
                 } else {
                     notifyError(getStringFrom(R.string.apk_update_download_failed));
                     toastError(R.string.apk_update_download_failed);
-                    Log.i("89898989",e.toString());
+                    Log.i("89898989", e.toString());
                 }
 
             } finally {
@@ -356,9 +352,8 @@ public class DownloadInstaller {
 
     /**
      * 安装过程处理
-     *
+     * <p>
      * 取消安装未知来源后不可以用，Activity For Result 不可用
-     *
      */
     public void installProcess() {
         if (isDownloadOnly) return;
@@ -379,7 +374,7 @@ public class DownloadInstaller {
 
                 //这里有些手机拿不到返回的值，每家厂商的策略不同....
                 startActivityLauncher.launch(intent, result -> {
-                    if(result.getResultCode()==Activity.RESULT_OK){
+                    if (result.getResultCode() == Activity.RESULT_OK) {
                         if (downloadStatus == UpdateStatus.UNINSTALL) {
                             installProcess();
                         }
